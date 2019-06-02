@@ -1,66 +1,64 @@
 #pragma once
 
 #include "I_tree.h"
+#include "tree_node.h"
 
 #include <memory>
 #include <iterator>
-
-template <typename T>
-struct node
-{
-	// ........ pointer to parent ........ //
-	std::unique_ptr<node<T>> parent;
-
-	// ........ pointers to children ........ //
-	std::unique_ptr<node<T>> left;    
-	std::unique_ptr<node<T>> middle;  
-	std::unique_ptr<node<T>> right;   
-
-	// ........ node values ........ //
-	T val1;
-	T val2;
-
-	// ........ values number ........ //
-	size_t num;
-};
+#include <initializer_list>
 
 template<typename T>
 class tree : public I_tree<T>
 {
 public:
-	using pointer_type = std::unique_ptr<node<T>>;
-	using value_type   = T;
-	using self_type    = tree;
-
-private:
-	template<typename T>
-	class iterator : public std::iterator<std::forward_iterator_tag, 
-							pointer_type,
-							std::ptrdiff_t>
-	{
-	public:
-		using itr_reference_type = iterator<T>&;
-		using itr_value_type     = iterator<T>;
-	public:
-		itr_reference_type operator ++ ();
-		itr_value_type operator++(int);
-
-		value_type& operator*();
-		value_type* operator->();
-		const value_type* operator->() const;
-
-		bool operator==(const itr_reference_type) const;
-		bool operator!=(const itr_reference_type) const;
-	private:
-		pointer_type itr;
-	}
+	// ............ usings ............ //
+	using node_type     = node<T>;
+	using node_ref_type = node<T>&;
+	using node_ptr_type = std::shared_ptr<node<T>>;
+	using val_ptr_type  = std::shared_ptr<T>;
+	using val_ref_type  = T&;
+	using val_type      = T;
+	using self_type     = tree<T>;
 
 public:
-	void insert() = 0;
-	void find() = 0;
-	void erase() = 0;
+	// ............... iterator for tree ............... //
+	using base_iterator = std::iterator<std::forward_iterator_tag, node_ptr_type>;
+
+	class iterator : public base_iterator
+	{
+	public:
+		iterator&          operator++();
+		iterator           operator++(int);
+		val_ref_type       operator*();
+		val_ptr_type       operator->();
+		const val_ptr_type operator->() const;
+		bool               operator==(const iterator& itr) const;
+		bool               operator!=(const iterator& itr) const;
+	private:
+		node_ptr_type itr = nullptr;
+	};
+
+public:
+	// ............... citors ............... //
+	tree() = default;
+	tree(std::initializer_list<T> list);
+public:
+	// ............... public member functions ............... //
+	void insert(val_type value);
+	void find();
+	void erase();
+	void clear();
+	void size();
+
 	iterator begin();
 	iterator end();
+	
 private:
-	std::unique_ptr<node<T>> m_root;
+	// ............... private member functions ............... //
+	bool is_leaf(const node_ref_type)const;
+	void split_node(node_ref_type);
+
+private:
+	// ............... tree root ............... //
+	node_ptr_type m_root = nullptr;
 };
