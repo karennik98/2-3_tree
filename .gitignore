@@ -17,3 +17,6 @@
 *.ilk
 garbage/.vs/garbage/v15/.suo
 *.exe
+
+.gitignore
+.gitattributes
