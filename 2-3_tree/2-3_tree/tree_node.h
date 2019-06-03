@@ -1,21 +1,18 @@
 #pragma once
-#include <memory>
 
 template <typename T>
 class node
 {
 public:
-	// ........ usings ........ //
-	using ptr_type = std::shared_ptr<node<T>>;
-public:
-	// ........ citors ........ //
-	node() = default;
+	using ptr_type = node<T>*;
 
-	// ........ setter ........ //
-	void set_first_key(T value)
+	node() = default;
+	node(T first = T(), T second = T())
+		: m_first(first)
+		, m_second(second)
 	{
-		m_first = value;
 	}
+
 	void set_second_key(T value)
 	{
 		m_second = value;
@@ -25,30 +22,31 @@ public:
 			std::swap(m_first, m_second);
 		}
 	}
+	void set_first_key(T value)      { m_first = value; }
+	T get_firts_key()const           { return m_first;  }
+	T get_second_key()const          { return m_second; }
 
-	// ........ getter ........ //
-	size_t get_keys_conut()const
-	{
-		return m_count;
-	}
-	ptr_type get_parent()const
-	{
-		return m_parent;
-	}
+	size_t   get_keys_conut()const   { return m_count;  }
+	
+	ptr_type get_parent()const       { return m_parent; }
+	ptr_type get_left_child()const   { return m_left;   }
+	ptr_type get_middle_child()const { return m_middle; }
+	ptr_type get_right_child()const  { return m_right;  }
 
-	// ........ is based methods ........ //
-	bool is_leaf()const { return m_is_leaf; }
+	bool is_leaf()const 
+	{ 
+		return (m_left == nullptr && m_middle == nullptr && m_right == nullptr);
+	}
 
 private:
-	// ........ pointer to parent ........ //
 	ptr_type m_parent = nullptr;
-	// ........ pointers to children ........ //
+
 	ptr_type m_left = nullptr;
 	ptr_type m_middle = nullptr;
 	ptr_type m_right = nullptr;
-	// ........ node values ........ //
+
 	T m_first = T();
 	T m_second = T();
-	// ........ values count ........ //
+
 	size_t m_count = 0;
 };
