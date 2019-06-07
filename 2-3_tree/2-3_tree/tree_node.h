@@ -1,5 +1,6 @@
 #pragma once
 
+
 template <typename T>
 class node
 {
@@ -7,46 +8,112 @@ public:
 	using ptr_type = node<T>*;
 
 	node() = default;
-	node(T first = T(), T second = T())
+	node(T first, ptr_type left, ptr_type middle, ptr_type right, ptr_type temp, ptr_type parent)
 		: m_first(first)
-		, m_second(second)
+		, m_left(left)
+		, m_middle(middle)
+		, m_right(right)
+		, m_temp(temp)
+		, m_parent(parent)
 	{
+		m_count = 1;
 	}
 
-	void set_second_key(T value)
+	bool is_leaf()const
 	{
-		m_second = value;
+		return !this->m_left;
+	}
 
-		if (m_first > m_second)
+	void set_key(T value)
+	{
+		if (m_count == 0)
 		{
-			std::swap(m_first, m_second);
+			m_first = value;
+			m_count++;
+			return;
+		}
+
+		else if (m_count == 1)
+		{
+			m_second = value;
+			m_count++;
+			if (m_first > m_second)
+			{
+				std::swap(m_first, m_second);
+			}
+			return;
+		}
+
+		if (m_count == 2)
+		{
+			m_third = value;
+			m_count++;
+			sort();
+			return;
 		}
 	}
-	void set_first_key(T value)      { m_first = value; }
-	T get_firts_key()const           { return m_first;  }
-	T get_second_key()const          { return m_second; }
 
-	size_t   get_keys_conut()const   { return m_count;  }
-	
-	ptr_type get_parent()const       { return m_parent; }
-	ptr_type get_left_child()const   { return m_left;   }
-	ptr_type get_middle_child()const { return m_middle; }
-	ptr_type get_right_child()const  { return m_right;  }
+	void become_two_node(T value, ptr_type node_1, ptr_type node_2)
+	{
+		m_first = value;
+		m_second = T();
+		m_third = T();
 
-	bool is_leaf()const 
-	{ 
-		return (m_left == nullptr && m_middle == nullptr && m_right == nullptr);
+		m_left = node_1;
+		m_right = node_2;
+		m_middle = nullptr;
+		m_temp = nullptr;
+
+		m_count = 1;
+	}
+
+	void show()
+	{
+		if (m_count == 1)
+		{
+			std::cout <<"( "<<m_first << " )";
+		}
+
+		else if (m_count == 2)
+		{
+			std::cout << "( " << m_first << ", " << m_second << " )";
+		}
+		std::cout << std::endl;
 	}
 
 private:
+	void sort()
+	{
+		if (m_first > m_second)
+		{
+			std::swap(m_first, m_second);
+			if (m_second > m_third)
+			{
+				std::swap(m_second, m_third);
+			}
+		}
+
+		else if (m_second > m_third)
+		{
+			std::swap(m_second, m_third);
+			if (m_first > m_second)
+			{
+				std::swap(m_first, m_second);
+			}
+		}
+	}
+
+public:
 	ptr_type m_parent = nullptr;
 
 	ptr_type m_left = nullptr;
 	ptr_type m_middle = nullptr;
 	ptr_type m_right = nullptr;
+	ptr_type m_temp = nullptr;
 
 	T m_first = T();
 	T m_second = T();
+	T m_third = T();
 
 	size_t m_count = 0;
 };
